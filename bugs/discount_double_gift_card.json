@@ -1,0 +1,7 @@
+{
+  "id": "BUG-1842",
+  "title": "Discount code DOUBLE returns wrong total on gift cards",
+  "description": "When a user applies promo code 'DOUBLE' to an order that contains only a gift card, the discount is calculated incorrectly. Expected behavior is 20% off the order total. Observed behavior: the discount comes back as $0. Started about two weeks ago. Reproduction is inconsistent — only happens on gift-card orders.",
+  "reporter": "qa-team",
+  "severity": "high"
+}

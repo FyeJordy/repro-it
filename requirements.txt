@@ -1,0 +1,9 @@
+# Repro-It agent dependencies
+# Note: numpy<2 constraint required for Python 3.9 compatibility
+# ibm-watsonx-ai 0.0.5 transitively pulls pandas 1.5.3, which has binary
+# incompatibility with numpy 2.x on Python 3.9 ("numpy.dtype size changed" error)
+
+pytest==7.4.3
+numpy<2
+pandas==1.5.3
+ibm-watsonx-ai==0.0.5
