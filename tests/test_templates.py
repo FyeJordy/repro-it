@@ -10,6 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from agent.test_templates import (
     PricingDiscountTemplate,
     FlaskCheckoutTemplate,
+    FunctionOutputTemplate,
     select_template
 )
 
@@ -346,3 +347,115 @@ class TestFlaskCheckoutTemplate:
 
 
 # Made with Bob
+
+
+class TestFunctionOutputTemplate:
+    """Test FunctionOutputTemplate code generation."""
+    
+    def test_generates_parse_price_import(self):
+        """Template should generate code with parse_price import."""
+        template = FunctionOutputTemplate()
+        bug_report = {
+            "title": "parse_price returns wrong value for dollar amounts",
+            "description": "parse_price(\"$10.00\") returns 0.0 but should return 10.0",
+            "expected": "parse_price(\"$10.00\") should return 10.0",
+            "observed": "parse_price(\"$10.00\") returns 0.0"
+        }
+        
+        test_code = template.generate_test(bug_report, {}, "/test/repo")
+        
+        assert "from utils import parse_price" in test_code
+    
+    def test_generates_parse_price_call(self):
+        """Template should generate code that calls parse_price."""
+        template = FunctionOutputTemplate()
+        bug_report = {
+            "title": "parse_price returns wrong value for dollar amounts",
+            "description": "parse_price(\"$10.00\") returns 0.0 but should return 10.0",
+            "expected": "parse_price(\"$10.00\") should return 10.0",
+            "observed": "parse_price(\"$10.00\") returns 0.0"
+        }
+        
+        test_code = template.generate_test(bug_report, {}, "/test/repo")
+        
+        assert 'parse_price("$10.00")' in test_code
+    
+    def test_generates_expected_value_assertion(self):
+        """Template should assert expected value of 10.0."""
+        template = FunctionOutputTemplate()
+        bug_report = {
+            "title": "parse_price returns wrong value for dollar amounts",
+            "description": "parse_price(\"$10.00\") returns 0.0 but should return 10.0",
+            "expected": "parse_price(\"$10.00\") should return 10.0",
+            "observed": "parse_price(\"$10.00\") returns 0.0"
+        }
+        
+        test_code = template.generate_test(bug_report, {}, "/test/repo")
+        
+        assert "expected = 10.0" in test_code
+        assert "assert result == expected" in test_code
+    
+    def test_no_placeholder_code(self):
+        """Template should not generate placeholder code."""
+        template = FunctionOutputTemplate()
+        bug_report = {
+            "title": "parse_price returns wrong value for dollar amounts",
+            "description": "parse_price(\"$10.00\") returns 0.0 but should return 10.0",
+            "expected": "parse_price(\"$10.00\") should return 10.0",
+            "observed": "parse_price(\"$10.00\") returns 0.0"
+        }
+        
+        test_code = template.generate_test(bug_report, {}, "/test/repo")
+        
+        assert "TODO" not in test_code
+        assert "not yet implemented" not in test_code
+        assert "assert False" not in test_code
+
+
+class TestTemplateSelectionWithFunctionBugs:
+    """Test template selection for function output bugs."""
+    
+    def test_parse_price_bug_selects_function_template(self):
+        """Bug mentioning parse_price should select FunctionOutputTemplate."""
+        bug_report = {
+            "title": "parse_price returns wrong value for dollar amounts",
+            "description": "parse_price(\"$10.00\") returns 0.0 but should return 10.0",
+            "expected": "parse_price(\"$10.00\") should return 10.0",
+            "observed": "parse_price(\"$10.00\") returns 0.0"
+        }
+        
+        template_class = select_template(bug_report)
+        assert template_class == FunctionOutputTemplate
+    
+    def test_function_return_bug_selects_function_template(self):
+        """Bug mentioning function returns should select FunctionOutputTemplate."""
+        bug_report = {
+            "title": "Function returns incorrect value",
+            "description": "The function returns 0.0 when it should return 10.0",
+            "expected": "Function should return 10.0",
+            "observed": "Function returns 0.0"
+        }
+        
+        template_class = select_template(bug_report)
+        assert template_class == FunctionOutputTemplate
+    
+    def test_discount_bug_still_selects_pricing_template(self):
+        """Discount bug should still select PricingDiscountTemplate."""
+        bug_report = {
+            "title": "Discount code DOUBLE returns wrong total on gift cards",
+            "description": "When a user applies promo code 'DOUBLE' to an order that contains only a gift card, the discount is calculated incorrectly."
+        }
+        
+        template_class = select_template(bug_report)
+        assert template_class == PricingDiscountTemplate
+    
+    def test_api_bug_still_selects_flask_template(self):
+        """API bug should still select FlaskCheckoutTemplate."""
+        bug_report = {
+            "title": "API returns wrong total",
+            "description": "The checkout API endpoint returns incorrect totals"
+        }
+        
+        template_class = select_template(bug_report)
+        assert template_class == FlaskCheckoutTemplate
+

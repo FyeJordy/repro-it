@@ -4,9 +4,9 @@
 
 ## 📋 Problem and Solution Statement (paste into form)
 
-**Problem**: Developers waste hours manually reproducing bugs from vague reports like "discount code not working on gift cards." This slows debugging and delays fixes.
+**Problem**: Developers waste hours manually reproducing bugs from vague reports like "discount code not working on gift cards" or "parse_price returns wrong value." This slows debugging and delays fixes.
 
-**Solution**: Repro-It automates bug reproduction by reading structured bug reports, searching codebases, generating pytest regression tests, and using IBM watsonx.ai with Granite 8B Code Instruct to verify test failures match the reported bug.
+**Solution**: Repro-It automates bug reproduction by reading structured bug reports, searching codebases, generating pytest regression tests, and using IBM watsonx.ai with Granite 8B Code Instruct to verify test failures match the reported bug. Supports pricing/discount bugs and function-output bugs.
 
 **How it works**:
 1. Parse bug report JSON to extract signals (discount codes, categories, keywords)

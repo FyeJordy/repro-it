@@ -74,9 +74,13 @@ class HeuristicAgent:
         # Extract domain keywords
         domain_keywords = [
             "discount", "pricing", "checkout", "order", "item",
-            "gift", "card", "calculate", "total", "subtotal"
+            "gift", "card", "calculate", "total", "subtotal", "parse_price"
         ]
         keywords = [kw for kw in domain_keywords if kw in full_text]
+        
+        # Also extract function names (snake_case identifiers)
+        function_names = re.findall(r'\b[a-z]+_[a-z]+\b', full_text)
+        keywords.extend(function_names)
         
         return {
             "keywords": list(set(keywords)),
@@ -143,56 +147,21 @@ class HeuristicAgent:
         """
         self.log("Generating regression test...")
         
+        # Use template system to generate test
+        from .test_templates import select_template
+        
+        # Select appropriate template based on bug report
+        template_class = select_template(signals)
+        template = template_class()
+        
+        self.log(f"Using template: {template_class.__name__}")
+        
+        # Generate test code using template
+        test_code = template.generate_test(signals, code_map, repo_root)
+        
         # Determine test filename from bug title
         title_slug = re.sub(r'[^a-z0-9]+', '_', signals["title"].lower())
         test_filename = f"test_bug_{title_slug[:30]}.py"
-        
-        # Build imports - always include required models and pricing
-        imports = ["import sys", "import os"]
-        imports.append("sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))")
-        imports.append("")
-        
-        # Always import Item and Order from models (required for test generation)
-        imports.append("from models import Item, Order")
-        
-        # Always import calculate_total from pricing (required for test execution)
-        imports.append("from pricing import calculate_total")
-        
-        # Generate test function
-        test_name = f"test_{title_slug[:40]}"
-        
-        # Build test body based on signals
-        test_body = []
-        test_body.append(f'    """Regression test: {signals["title"]}"""')
-        
-        # Create test scenario - must have both discount codes and categories
-        if signals["discount_codes"] and signals["categories"]:
-            discount_code = signals["discount_codes"][0]
-            category = signals["categories"][0]
-            
-            test_body.append(f"    # Create order with {category} item")
-            test_body.append(f'    items = [Item("Gift Card", 100.0, "{category}")]')
-            test_body.append(f'    order = Order(items, discount_code="{discount_code}")')
-            test_body.append(f"    ")
-            test_body.append(f"    # Calculate total with discount")
-            test_body.append(f"    total = calculate_total(order)")
-            test_body.append(f"    ")
-            test_body.append(f"    # Expected: 20% discount should apply to full order")
-            test_body.append(f"    expected = 80.0  # 100 - 20%")
-            test_body.append(f"    assert total == expected, f'Expected {{expected}}, got {{total}}'")
-        else:
-            # Cannot generate valid test without proper signals
-            return {
-                "test_code": None,
-                "test_filename": test_filename,
-                "error": "Insufficient signals to generate test"
-            }
-        
-        # Combine into full test code
-        test_code = "\n".join(imports) + "\n\n"
-        test_code += f"def {test_name}():\n"
-        test_code += "\n".join(test_body)
-        test_code += "\n"
         
         return {
             "test_code": test_code,

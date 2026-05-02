@@ -4,8 +4,14 @@
 
 ### Run the Demo
 
+**Primary demo (pricing/discount bug):**
 ```bash
 python3 repro_it.py --bug bugs/discount_double_gift_card.json --repo demo_repo --verbose
+```
+
+**Optional second demo (function-output bug):**
+```bash
+python3 repro_it.py --bug bugs/function_parse_price_bug.json --repo demo_repo --verbose
 ```
 
 ## Expected Success Signals

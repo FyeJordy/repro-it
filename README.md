@@ -11,7 +11,7 @@
 
 ## What + Why
 
-Bug reports are often vague: "discount code not working on gift cards." Developers waste hours manually reproducing issues. Repro-It automates this: reads bug report JSON, searches codebase, generates pytest regression test, runs it, and uses IBM watsonx.ai with Granite 8B Code Instruct to verify it fails for the right reason.
+Bug reports are often vague: "discount code not working on gift cards" or "parse_price returns wrong value." Developers waste hours manually reproducing issues. Repro-It automates this: reads bug report JSON, searches codebase, generates pytest regression test, runs it, and uses IBM watsonx.ai with Granite 8B Code Instruct to verify it fails for the right reason. Supports pricing/discount bugs and function-output bugs.
 
 ## Demo
 

@@ -29,8 +29,8 @@ jobs:
       run: |
         python -m pytest tests/test_tools.py -v
 
-    - name: Run demo repo tests
+    - name: Run demo repo happy-path tests
       run: |
-        python -m pytest demo_repo/tests/test_pricing.py -v
+        python -m pytest demo_repo/tests/test_pricing.py demo_repo/tests/test_utils.py -v
 
 # Made with Bob

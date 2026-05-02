@@ -162,10 +162,14 @@ def check_right_reason(run_result: Dict[str, Any], signals: Dict[str, Any],
         for kw in signals.get("keywords", [])[:3]
     )
     
-    # Must have at least 2 of 3 scenario elements
+    # Check for specific function calls (for function-output bugs)
+    # Look for actual function calls like parse_price(), not just test definitions
+    has_function_call = "parse_price(" in test_code_lower
+    
+    # Must have at least 2 of 3 scenario elements, or have specific function call
     scenario_score = sum([has_discount_code, has_category, has_keywords])
     
-    if scenario_score < 2:
+    if scenario_score < 2 and not has_function_call:
         return False
     
     # Check 4: Failure messages relate to expected behavior

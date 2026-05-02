@@ -173,8 +173,12 @@ class SubmissionVerifier:
     def run_tests(self, test_path: str, description: str) -> bool:
         """Run pytest on specified path and capture results."""
         try:
+            # Split test_path by spaces to handle multiple test files
+            test_paths = test_path.split()
+            cmd = [sys.executable, '-m', 'pytest'] + test_paths + ['-v']
+            
             result = subprocess.run(
-                [sys.executable, '-m', 'pytest', test_path, '-v'],
+                cmd,
                 cwd=self.project_root,
                 capture_output=True,
                 text=True,
@@ -258,7 +262,7 @@ class SubmissionVerifier:
         if not self.run_tests("tests/", "Main test suite (tests/)"):
             all_passed = False
         
-        if not self.run_tests("demo_repo/tests/test_pricing.py", "Demo pricing tests"):
+        if not self.run_tests("demo_repo/tests/test_pricing.py demo_repo/tests/test_utils.py", "Demo repo happy-path tests"):
             all_passed = False
         
         print()

@@ -1,0 +1,9 @@
+{
+  "id": "BUG-2201",
+  "title": "parse_price returns wrong value for dollar amounts",
+  "description": "parse_price(\"$10.00\") returns 0.0 but should return 10.0",
+  "reporter": "qa-team",
+  "severity": "medium",
+  "expected": "parse_price(\"$10.00\") should return 10.0",
+  "observed": "parse_price(\"$10.00\") returns 0.0"
+}
