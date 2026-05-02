@@ -18,6 +18,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+from typing import Optional, Tuple
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -26,7 +27,7 @@ app = Flask(__name__)
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 
 
-def validate_path(path_str: str) -> tuple[bool, str]:
+def validate_path(path_str: str) -> Tuple[bool, str]:
     """
     Validate that a path is safe to use.
     
@@ -55,7 +56,7 @@ def validate_path(path_str: str) -> tuple[bool, str]:
     return True, ""
 
 
-def parse_repro_output(stdout: str) -> tuple[str | None, str]:
+def parse_repro_output(stdout: str) -> Tuple[Optional[str], str]:
     """
     Parse stdout to extract judge_provider and failure_summary.
     
