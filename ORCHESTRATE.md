@@ -40,7 +40,7 @@ python -m pip install ibm-watsonx-orchestrate
 ```
 ┌─────────────┐      ┌──────────────────┐      ┌─────────────┐
 │ Orchestrate │─────▶│ Public Tunnel    │─────▶│ Flask Bridge│
-│             │      │ (ngrok/cloudflare)│      │ (port 5001) │
+│             │      │ (ngrok/cloudflare)│      │ (port 8787) │
 └─────────────┘      └──────────────────┘      └──────┬──────┘
                                                        │
                                                        ▼
@@ -72,22 +72,22 @@ pip install flask
 
 ```bash
 cd repro-it
-python3 orchestrate_bridge/app.py
+PORT=8787 python3 orchestrate_bridge/app.py
 ```
 
 You should see:
 ```
-Starting Orchestrate Bridge on port 5001
+Starting Orchestrate Bridge on port 8787
 Project root: /path/to/repro-it
-Health check: http://localhost:5001/health
-Run repro: POST http://localhost:5001/run-repro
+Health check: http://localhost:8787/health
+Run repro: POST http://localhost:8787/run-repro
 ```
 
 ### 3. Test Locally with curl
 
 Health check:
 ```bash
-curl http://localhost:5001/health
+curl http://localhost:8787/health
 ```
 
 Expected response:
@@ -97,14 +97,14 @@ Expected response:
 
 Run Repro-It with default paths:
 ```bash
-curl -X POST http://localhost:5001/run-repro \
+curl -X POST http://localhost:8787/run-repro \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
 
 Run with custom paths:
 ```bash
-curl -X POST http://localhost:5001/run-repro \
+curl -X POST http://localhost:8787/run-repro \
   -H "Content-Type: application/json" \
   -d '{
     "bug_path": "bugs/discount_double_gift_card.json",
@@ -118,8 +118,8 @@ Expected response:
   "ok": true,
   "exit_code": 0,
   "success": true,
-  "judge_provider": "watsonx",
-  "failure_summary": "",
+  "judge_provider": "watsonx.ai",
+  "failure_summary": "E   AssertionError: Expected 80.0, got 100.0",
   "stdout": "...",
   "stderr": ""
 }
@@ -135,7 +135,7 @@ To use with Orchestrate, you need to expose your local server via a public tunne
 
 2. Start tunnel:
 ```bash
-ngrok http 5001
+ngrok http 8787
 ```
 
 3. Copy the HTTPS URL (e.g., `https://abc123.ngrok.io`)
@@ -146,10 +146,10 @@ ngrok http 5001
 
 2. Start tunnel:
 ```bash
-cloudflared tunnel --url http://localhost:5001
+cloudflared tunnel --url http://localhost:8787
 ```
 
-3. Copy the HTTPS URL (e.g., `https://xyz789.trycloudflare.com`)
+3. Copy the HTTPS URL from the output
 
 ## Generate OpenAPI Specification
 
@@ -223,8 +223,8 @@ Run Repro-It with specified bug and repo paths.
   "ok": true,
   "exit_code": 0,
   "success": true,
-  "judge_provider": "watsonx",
-  "failure_summary": "",
+  "judge_provider": "watsonx.ai",
+  "failure_summary": "E   AssertionError: Expected 80.0, got 100.0",
   "stdout": "...",
   "stderr": ""
 }
@@ -234,8 +234,8 @@ Run Repro-It with specified bug and repo paths.
 - `ok`: Whether the API call succeeded
 - `exit_code`: Process exit code (0 = success)
 - `success`: Whether repro_it.py succeeded
-- `judge_provider`: AI judge used ("watsonx", "heuristic", or null)
-- `failure_summary`: Summary of any failure
+- `judge_provider`: Judge used ("watsonx.ai", "deterministic", or null)
+- `failure_summary`: Summary of test failure
 - `stdout`: Full standard output
 - `stderr`: Full standard error
 
@@ -265,6 +265,9 @@ The bridge respects the same environment variables as the CLI:
 
 - `WATSONX_API_KEY` - Your watsonx API key (required for AI judge)
 - `WATSONX_PROJECT_ID` - Your watsonx project ID (required for AI judge)
+- `WATSONX_URL` - watsonx API URL (default: https://us-south.ml.cloud.ibm.com)
+- `WATSONX_MODEL_ID` - Model ID (default: ibm/granite-8b-code-instruct)
+- `PORT` - Bridge server port (default: 5001, recommended: 8787)
 
 **IMPORTANT:** The bridge never prints or returns these values. They remain secure in your environment.
 
@@ -272,17 +275,18 @@ Set them before starting the bridge:
 ```bash
 export WATSONX_API_KEY="your-key-here"
 export WATSONX_PROJECT_ID="your-project-id"
-python3 orchestrate_bridge/app.py
+export WATSONX_URL="https://us-south.ml.cloud.ibm.com"
+PORT=8787 python3 orchestrate_bridge/app.py
 ```
 
 ## Troubleshooting
 
 ### Bridge won't start
-- Check if port 5001 is already in use: `lsof -i :5001`
-- Try a different port by editing `app.py`
+- Check if port 8787 is already in use: `lsof -i :8787`
+- Try a different port: `PORT=9000 python3 orchestrate_bridge/app.py`
 
 ### Tunnel connection fails
-- Ensure bridge is running on port 5001
+- Ensure bridge is running on port 8787
 - Check firewall settings
 - Try a different tunnel service
 
@@ -299,7 +303,8 @@ python3 orchestrate_bridge/app.py
 ### Environment variables not working
 - Set them in the same terminal where you start the bridge
 - Don't set them in a different terminal
-- Verify with `echo $WATSONX_API_KEY` (but don't share the output!)
+- Confirm environment variables are set without printing their values
+- If watsonx.ai judge fails, bridge will fall back to deterministic judge
 
 ## Limitations
 
