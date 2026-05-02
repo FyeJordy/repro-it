@@ -67,7 +67,8 @@ def parse_repro_output(stdout: str) -> Tuple[Optional[str], str]:
     failure_summary = ""
     
     # Look for judge provider in output
-    judge_match = re.search(r'Judge provider:\s*(\w+)', stdout)
+    # Match "watsonx.ai" or "deterministic"
+    judge_match = re.search(r'Judge provider:\s*([\w.]+)', stdout)
     if judge_match:
         judge_provider = judge_match.group(1)
     
@@ -221,10 +222,11 @@ def run_repro():
 
 
 if __name__ == '__main__':
-    print(f"Starting Orchestrate Bridge on port 5001")
+    port = int(os.getenv("PORT", "5001"))
+    print(f"Starting Orchestrate Bridge on port {port}")
     print(f"Project root: {PROJECT_ROOT}")
-    print(f"Health check: http://localhost:5001/health")
-    print(f"Run repro: POST http://localhost:5001/run-repro")
-    app.run(host='0.0.0.0', port=5001, debug=False)
+    print(f"Health check: http://localhost:{port}/health")
+    print(f"Run repro: POST http://localhost:{port}/run-repro")
+    app.run(host='0.0.0.0', port=port, debug=False)
 
 # Made with Bob
