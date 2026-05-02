@@ -68,7 +68,10 @@ python3 -m pip install -r requirements.txt
 # 2. Install demo Flask app dependencies
 python3 -m pip install -r demo_repo/requirements.txt
 
-# 3. Run with deterministic judge
+# 3. (Optional) Convert plain-text bug notes to JSON
+python3 scripts/bug_text_to_json.py --text "QA says discount broken. Expected 20% off but got $100." --out bugs/my_bug.json
+
+# 4. Run with deterministic judge
 python3 repro_it.py --bug bugs/discount_double_gift_card.json --repo demo_repo --verbose
 
 # Optional: Enable watsonx.ai judge

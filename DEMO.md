@@ -4,6 +4,11 @@
 
 ### Run the Demo
 
+**Optional: Convert plain-text bug notes to JSON:**
+```bash
+python3 scripts/bug_text_to_json.py --text "QA says DOUBLE discount is broken on gift cards. Expected 20% off but checkout shows $100." --out bugs/from_text_bug.json
+```
+
 **Primary demo (pricing/discount bug):**
 ```bash
 python3 repro_it.py --bug bugs/discount_double_gift_card.json --repo demo_repo --verbose
