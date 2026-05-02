@@ -2,11 +2,38 @@
 
 **IMPORTANT: Orchestrate integration is OPTIONAL.** The main Repro-It CLI demo works perfectly without it. This bridge is provided for users who want to trigger Repro-It via IBM watsonx Orchestrate.
 
+## Success Story
+
+✅ **IBM watsonx Orchestrate successfully integrated and tested!**
+
+The Orchestrate agent called Repro-It through the imported OpenAPI tool "Run Repro-It test reproduction" and successfully reproduced the discount gift-card bug:
+
+- **Bug reproduced**: Yes
+- **Judge provider**: watsonx.ai
+- **Failure summary**: E AssertionError: Expected 80.0, got 100.0
+
+The integration uses a local Flask bridge exposed via temporary Cloudflare Tunnel for demo purposes.
+
 ## Overview
 
 The Orchestrate Bridge exposes Repro-It functionality via a REST API that can be imported into Orchestrate as a custom tool. This allows you to ask Orchestrate to run Repro-It demos using natural language.
 
-**The local CLI remains the source of truth.** Use `python3 repro_it.py` for direct control and debugging.
+**The local CLI remains the source of truth.** Use `python3 repro_it.py` for direct control and debugging (as shown in README.md and DEMO.md).
+
+## Python Version Requirements
+
+**Repro-It itself works with Python 3.9+** and can be run with your system's `python3` as documented in README.md and DEMO.md.
+
+However, if you want to use the **IBM watsonx Orchestrate ADK CLI** to import/manage tools, it requires **Python 3.11+**. We recommend creating a separate virtual environment for the Orchestrate ADK CLI:
+
+```bash
+# Create a Python 3.11+ virtual environment for Orchestrate ADK CLI
+/opt/homebrew/bin/python3.11 -m venv ~/wxo-adk-venv
+source ~/wxo-adk-venv/bin/activate
+python -m pip install ibm-watsonx-orchestrate
+```
+
+**Important:** This virtual environment is **only for importing/managing Orchestrate tools**. It does not change the Repro-It runtime. The bridge server and Repro-It CLI continue to run with your system's Python 3.9+ installation.
 
 ## Architecture
 

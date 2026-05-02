@@ -7,6 +7,7 @@
 - [DEMO.md](DEMO.md) - Detailed demonstration walkthrough
 - [SUBMISSION.md](SUBMISSION.md) - Submission details and requirements
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - Technical architecture documentation
+- [ORCHESTRATE.md](ORCHESTRATE.md) - IBM watsonx Orchestrate integration (optional)
 
 ## What + Why
 
@@ -36,9 +37,13 @@ Failure message: AssertionError: Expected 80.0, got 100.0
 4. Run pytest → Execute test locally
 5. watsonx.ai judge → Granite 8B verifies failure matches bug (or deterministic fallback)
 
-## IBM Bob & This Project
+## IBM Technologies
 
-Bob was the development partner. Contributions: designed architecture, generated demo repo with seeded bug, built local tools (read_file, search_repo, write_test, run_pytest), implemented deterministic agent, integrated watsonx.ai judge, debugged SDK, stabilized demo (3/3 watsonx.ai runs, 5/5 deterministic).
+**watsonx.ai**: Granite 8B Code Instruct verifies test failures match bug reports (3/3 successful runs).
+
+**watsonx Orchestrate** (optional): Successfully integrated as agent interface. Orchestrate calls Repro-It through imported OpenAPI tool "Run Repro-It test reproduction". Demo result: Bug reproduced with watsonx.ai judge, failure "AssertionError: Expected 80.0, got 100.0". Bridge uses Flask API exposed via temporary Cloudflare Tunnel.
+
+**IBM Bob**: Development partner. Designed architecture, generated demo repo, built local tools, implemented deterministic agent, integrated watsonx.ai judge, created Orchestrate bridge, stabilized demos.
 
 ## Architecture
 

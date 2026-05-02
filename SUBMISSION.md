@@ -32,7 +32,7 @@
 
 **Bob Contributions**:
 - Assessed Bobcoin budget and tool constraints
-- Designed modular architecture (tools → agent → CLI → watsonx.ai)
+- Designed modular architecture (tools → agent → CLI → watsonx.ai → Orchestrate)
 - Generated demo repository with seeded gift card discount bug
 - Built local Python tools: read_file, search_repo, write_test, run_pytest
 - Wrote comprehensive unit tests for all tools
@@ -40,7 +40,8 @@
 - Fixed false-success handling (placeholder test detection)
 - Integrated IBM watsonx.ai as right-reason judge
 - Debugged SDK integration for ibm-watsonx-ai 0.0.5
-- Stabilized demo path (3/3 watsonx.ai runs, 5/5 deterministic runs)
+- Created Orchestrate bridge with Flask API and OpenAPI specification
+- Stabilized demos (3/3 watsonx.ai runs, 5/5 deterministic runs, 1/1 Orchestrate run)
 
 **IBM watsonx.ai Usage**:
 - **Model**: Granite 8B Code Instruct (`ibm/granite-8b-code-instruct`)
@@ -68,6 +69,16 @@
 - **Prompt**: Structured judge prompt rejecting import errors, placeholders, and unrelated failures
 - **Fallback**: Graceful degradation to deterministic verification
 
+### IBM watsonx Orchestrate
+- **Integration**: Optional agent interface via OpenAPI tool
+- **Tool Name**: "Run Repro-It test reproduction"
+- **Architecture**: Flask bridge exposed via temporary Cloudflare Tunnel
+- **Demo Result**: Successfully reproduced discount gift-card bug
+  - Bug reproduced: Yes
+  - Judge provider: watsonx.ai
+  - Failure summary: E AssertionError: Expected 80.0, got 100.0
+- **Note**: Main reliable demo remains the local Repro-It CLI
+
 ### IBM Bob
 - **Role**: Development partner and pair programmer
 - **Contributions**:
@@ -76,8 +87,9 @@
   - Built local Python tools (read_file, search_repo, write_test, run_pytest)
   - Implemented deterministic heuristic agent
   - Integrated watsonx.ai as right-reason judge
+  - Created Orchestrate bridge with Flask API and OpenAPI spec
   - Debugged SDK integration
-  - Stabilized demo path (3/3 watsonx.ai runs, 5/5 deterministic runs)
+  - Stabilized demos (3/3 watsonx.ai, 5/5 deterministic, 1/1 Orchestrate)
 
 ## Technical Architecture
 
