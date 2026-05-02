@@ -25,12 +25,16 @@ jobs:
         python -m pip install -r requirements.txt
         python -m pip install -r demo_repo/requirements.txt
 
-    - name: Run tool tests
+    - name: Run unit tests
       run: |
-        python -m pytest tests/test_tools.py -v
+        python -m pytest tests/ -v
 
     - name: Run demo repo happy-path tests
       run: |
         python -m pytest demo_repo/tests/test_pricing.py demo_repo/tests/test_utils.py -v
+
+    - name: Run verification script
+      run: |
+        python scripts/verify_submission.py
 
 # Made with Bob

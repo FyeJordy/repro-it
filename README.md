@@ -1,5 +1,7 @@
 # Repro-It
 
+![Tests](https://github.com/FyeJordy/repro-it/actions/workflows/tests.yml/badge.svg)
+
 **Turn vague bug reports into deterministic failing pytest tests using IBM watsonx.ai.**
 
 ## Quick Links
@@ -20,7 +22,7 @@ cd repro-it
 python3 repro_it.py --bug bugs/discount_double_gift_card.json --repo demo_repo --verbose
 ```
 
-**Output:**
+**Output (with watsonx.ai environment variables set):**
 ```
 ✅ SUCCESS: Bug reproduced with failing test
 Test file: demo_repo/tests/test_bug_discount_code_double_returns_w.py
@@ -28,6 +30,8 @@ Right-reason check: ✓ PASS
 Judge provider: watsonx.ai
 Failure message: AssertionError: Expected 80.0, got 100.0
 ```
+
+**Note:** Cold clones without watsonx.ai credentials automatically use `deterministic` fallback judge.
 
 ## How It Works
 

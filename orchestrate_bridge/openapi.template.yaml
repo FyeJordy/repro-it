@@ -92,8 +92,8 @@ paths:
                   judge_provider:
                     type: string
                     nullable: true
-                    description: AI judge provider used (e.g., "watsonx", "heuristic")
-                    example: watsonx
+                    description: AI judge provider used (e.g., "watsonx.ai", "deterministic")
+                    example: watsonx.ai
                   failure_summary:
                     type: string
                     description: Summary of any failure that occurred

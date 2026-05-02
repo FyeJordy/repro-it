@@ -83,6 +83,8 @@ Health check: http://localhost:8787/health
 Run repro: POST http://localhost:8787/run-repro
 ```
 
+**Note:** The Flask server binds to `host="0.0.0.0"` intentionally so that external tunnels (Cloudflare, ngrok) can reach the local bridge.
+
 ### 3. Test Locally with curl
 
 Health check:

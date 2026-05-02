@@ -47,7 +47,7 @@ This confirms that Repro-It successfully:
 
 **[0:15-0:30] Show the Bug Report**
 - Open `bugs/discount_double_gift_card.json`
-- "Here's a vague bug report: 'Discount code and gift card both apply, customer gets double discount.'"
+- "Here's a vague bug report: 'Discount code DOUBLE returns wrong total on gift cards.'"
 - "No stack trace, no line numbers, just a description."
 
 **[0:30-0:50] Run Repro-It**

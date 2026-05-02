@@ -70,7 +70,7 @@
 - **Fallback**: Graceful degradation to deterministic verification
 
 ### IBM watsonx Orchestrate
-- **Integration**: Optional agent interface via OpenAPI tool
+- **Integration**: Successfully integrated and verified through watsonx Orchestrate
 - **Tool Name**: "Run Repro-It test reproduction"
 - **Architecture**: Flask bridge exposed via temporary Cloudflare Tunnel
 - **Demo Result**: Successfully reproduced discount gift-card bug
