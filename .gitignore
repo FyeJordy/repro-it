@@ -16,6 +16,7 @@ venv/
 orchestrate_bridge/openapi.local.yaml
 orchestrate_bridge/*.pyc
 orchestrate_bridge/__pycache__/
+bugs/from_orchestrate.json
 
 # macOS
 .DS_Store

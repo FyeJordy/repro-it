@@ -241,6 +241,57 @@ Run Repro-It with specified bug and repo paths.
 - `stdout`: Full standard output
 - `stderr`: Full standard error
 
+### POST /run-repro-from-text
+
+Run Repro-It from plain-text bug report (converts text to JSON automatically).
+
+**Request Body:**
+```json
+{
+  "text": "QA says discount code DOUBLE is broken on gift cards. Expected 20% off but checkout shows full price $100.",
+  "bug_id": "BUG-orch-001",
+  "severity": "medium",
+  "repo_path": "demo_repo"
+}
+```
+
+**Response:**
+```json
+{
+  "ok": true,
+  "exit_code": 0,
+  "success": true,
+  "judge_provider": "watsonx.ai",
+  "failure_summary": "E   AssertionError: Expected 80.0, got 100.0",
+  "converted_bug": {
+    "id": "BUG-orch-001",
+    "title": "QA says discount code DOUBLE is broken on gift cards.",
+    "description": "QA says discount code DOUBLE is broken on gift cards. Expected 20% off but checkout shows full price $100.",
+    "reporter": "orchestrate",
+    "severity": "medium",
+    "expected": "Expected 20% off",
+    "observed": "checkout shows full price $100"
+  },
+  "stdout": "...",
+  "stderr": ""
+}
+```
+
+**Fields:**
+- Same as `/run-repro` plus:
+- `converted_bug`: The bug JSON object created from the plain text
+
+**Example with curl:**
+```bash
+curl -X POST http://localhost:8787/run-repro-from-text \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "QA says discount code DOUBLE is broken on gift cards. Expected 20% off but checkout shows full price $100."
+  }'
+```
+
+**Note:** The converted bug JSON is saved to `bugs/from_orchestrate.json` (gitignored).
+
 ## Path Validation
 
 The bridge validates all paths to prevent security issues:
