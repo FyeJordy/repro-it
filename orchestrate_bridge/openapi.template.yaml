@@ -1,0 +1,168 @@
+openapi: 3.0.0
+info:
+  title: Repro-It Orchestrate Bridge
+  description: |
+    Optional HTTP bridge for running Repro-It demos via Orchestrate.
+    
+    This bridge allows Orchestrate to trigger Repro-It test reproduction runs.
+    The main Repro-It CLI remains the source of truth and works independently.
+    
+    Security notes:
+    - All paths are validated to prevent directory traversal
+    - No secrets are exposed via this API
+    - Environment variables are never printed or returned
+  version: 1.0.0
+servers:
+  - url: https://REPLACE_ME_WITH_PUBLIC_URL
+    description: Public tunnel URL (ngrok, cloudflared, etc.)
+paths:
+  /health:
+    get:
+      operationId: health_check
+      summary: Health check
+      description: Returns server health status
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+  /run-repro:
+    post:
+      operationId: run_repro_it_demo
+      summary: Run Repro-It test reproduction
+      description: |
+        Executes Repro-It to reproduce a bug and generate a failing test.
+        
+        This endpoint runs the repro_it.py script with the specified bug and repo paths.
+        It validates all paths for security, executes with a 120-second timeout,
+        and returns detailed results including stdout, stderr, and parsed metadata.
+        
+        Default paths work with the included demo repository and bug examples.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bug_path:
+                  type: string
+                  description: Relative path to bug JSON file
+                  example: bugs/discount_double_gift_card.json
+                  default: bugs/discount_double_gift_card.json
+                repo_path:
+                  type: string
+                  description: Relative path to repository directory
+                  example: demo_repo
+                  default: demo_repo
+      responses:
+        '200':
+          description: Command executed (check success field for result)
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ok
+                  - exit_code
+                  - success
+                  - judge_provider
+                  - failure_summary
+                  - stdout
+                  - stderr
+                properties:
+                  ok:
+                    type: boolean
+                    description: Whether the API call succeeded
+                    example: true
+                  exit_code:
+                    type: integer
+                    description: Process exit code (0 = success)
+                    example: 0
+                  success:
+                    type: boolean
+                    description: Whether repro_it.py succeeded (exit_code == 0)
+                    example: true
+                  judge_provider:
+                    type: string
+                    nullable: true
+                    description: AI judge provider used (e.g., "watsonx", "heuristic")
+                    example: watsonx
+                  failure_summary:
+                    type: string
+                    description: Summary of any failure that occurred
+                    example: ""
+                  stdout:
+                    type: string
+                    description: Standard output from repro_it.py
+                    example: "Running Repro-It...\nTest generated successfully"
+                  stderr:
+                    type: string
+                    description: Standard error from repro_it.py
+                    example: ""
+        '400':
+          description: Invalid request (e.g., path validation failed)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: false
+                  exit_code:
+                    type: integer
+                    example: -1
+                  success:
+                    type: boolean
+                    example: false
+                  judge_provider:
+                    type: string
+                    nullable: true
+                    example: null
+                  failure_summary:
+                    type: string
+                    example: "Invalid bug_path: Path traversal (..) is not allowed"
+                  stdout:
+                    type: string
+                    example: ""
+                  stderr:
+                    type: string
+                    example: ""
+        '500':
+          description: Server error (e.g., timeout, unexpected exception)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: false
+                  exit_code:
+                    type: integer
+                    example: -1
+                  success:
+                    type: boolean
+                    example: false
+                  judge_provider:
+                    type: string
+                    nullable: true
+                    example: null
+                  failure_summary:
+                    type: string
+                    example: "Command timed out after 120 seconds"
+                  stdout:
+                    type: string
+                    example: ""
+                  stderr:
+                    type: string
+                    example: "Timeout"
+
+# Made with Bob

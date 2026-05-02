@@ -12,6 +12,11 @@ __pycache__/
 .venv/
 venv/
 
+# Orchestrate Bridge
+orchestrate_bridge/openapi.local.yaml
+orchestrate_bridge/*.pyc
+orchestrate_bridge/__pycache__/
+
 # macOS
 .DS_Store
 
