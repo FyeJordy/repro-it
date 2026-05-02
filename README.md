@@ -2,6 +2,12 @@
 
 **Turn vague bug reports into deterministic failing pytest tests using IBM watsonx.ai.**
 
+## Quick Links
+
+- [DEMO.md](DEMO.md) - Detailed demonstration walkthrough
+- [SUBMISSION.md](SUBMISSION.md) - Submission details and requirements
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - Technical architecture documentation
+
 ## What + Why
 
 Bug reports are often vague: "discount code not working on gift cards." Developers waste hours manually reproducing issues. Repro-It automates this: reads bug report JSON, searches codebase, generates pytest regression test, runs it, and uses IBM watsonx.ai with Granite 8B Code Instruct to verify it fails for the right reason.
@@ -68,6 +74,13 @@ python3 repro_it.py --bug bugs/discount_double_gift_card.json --repo demo_repo -
 ```
 
 Automatically falls back to deterministic judge if watsonx.ai unavailable.
+
+## Verification
+
+Validate submission readiness:
+```bash
+python3 scripts/verify_submission.py
+```
 
 ---
 
