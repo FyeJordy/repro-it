@@ -84,6 +84,44 @@ class SubmissionVerifier:
         if filepath.name == "verify_submission.py":
             return True
         
+        # Exclude Bob session transcripts that quote scanner rules
+        # Pattern 1: Lines with (case-sensitive) or (case-insensitive) annotations
+        if re.search(r'\(case[-\s]sensitive\)|\(case[-\s]insensitive\)', line_lower):
+            return True
+        
+        # Pattern 2: Lines containing regex tuple patterns like (r'pattern', "name", False)
+        # This catches scanner pattern definitions including those with regex escapes
+        if re.search(r"\(r['\"][\w_\\s+-]+['\"],\s*['\"][\w\s_-]+['\"],\s*(True|False)\)", line):
+            return True
+        
+        # Pattern 2b: Specifically catch bearer token pattern definitions with escaped sequences
+        # Matches lines like: (r'bearer\s+[a-zA-Z0-9]', "bearer token", False)
+        if re.search(r"r['\"]bearer\\s\+", line_lower):
+            return True
+        
+        # Pattern 2c: Catch lines with "bearer token" in quotes (pattern name, not actual token)
+        if re.search(r'["\']bearer\s+token["\']', line_lower):
+            return True
+        
+        # Pattern 3: Lines referencing this script's output format (filepath:line_num (pattern))
+        if re.search(r'scripts/verify_submission\.py:\d+\s*\([\w_\s-]+\)', line):
+            return True
+        
+        # Pattern 4: Lines beginning with "Detects:" followed by pattern names
+        if re.search(r'^\s*Detects:\s*[\w_-]+', line, re.IGNORECASE):
+            return True
+        
+        # Pattern 5: Lines that are clearly documentation of scanner patterns
+        # (e.g., listing pattern names without actual token values)
+        doc_patterns = [
+            r'pattern.*:.*["\']ApiKey-["\']',  # Documentation showing pattern
+            r'secret.*type.*:.*access_token',   # Documentation of secret types
+            r'detect.*:.*bearer\s+token',       # Documentation of detection
+        ]
+        for doc_pattern in doc_patterns:
+            if re.search(doc_pattern, line_lower):
+                return True
+        
         # Common false positive patterns
         false_positives = [
             "your-key",
