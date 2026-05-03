@@ -41,7 +41,7 @@
 - Integrated IBM watsonx.ai as right-reason judge
 - Debugged SDK integration for ibm-watsonx-ai 0.0.5
 - Created Orchestrate bridge with Flask API and OpenAPI specification
-- Stabilized demos (3/3 watsonx.ai runs, 5/5 deterministic runs, 1/1 Orchestrate run)
+- Stabilized demos (3/3 watsonx.ai runs, 5/5 deterministic runs, 3/3 Orchestrate runs)
 
 **IBM watsonx.ai Usage**:
 - **Model**: Granite 8B Code Instruct (`ibm/granite-8b-code-instruct`)
@@ -89,7 +89,7 @@
   - Integrated watsonx.ai as right-reason judge
   - Created Orchestrate bridge with Flask API and OpenAPI spec
   - Debugged SDK integration
-  - Stabilized demos (3/3 watsonx.ai, 5/5 deterministic, 1/1 Orchestrate)
+  - Stabilized demos (3/3 watsonx.ai, 5/5 deterministic, 3/3 Orchestrate)
 
 ## Technical Architecture
 

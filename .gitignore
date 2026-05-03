@@ -18,6 +18,9 @@ orchestrate_bridge/*.pyc
 orchestrate_bridge/__pycache__/
 bugs/from_orchestrate.json
 
+# Generated/temp files
+demo_repo/tests/test_bug_*.py
+
 # macOS
 .DS_Store
 

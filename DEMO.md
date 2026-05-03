@@ -45,21 +45,26 @@ python3 repro_it.py --bug bugs/function_parse_price_bug.json --repo demo_repo --
 
 When the demo runs successfully, you should see:
 
+**With watsonx.ai environment variables set:**
 ```
 ✅ SUCCESS: Bug reproduced with failing test
 Judge provider: watsonx.ai
+Failure message: AssertionError: Expected 80.0, got 100.0
 ```
 
-The generated test will fail with:
+**Cold clones with no environment variables:**
+```
+✅ SUCCESS: Bug reproduced with failing test
+Judge provider: deterministic
+Failure message: AssertionError: Expected 80.0, got 100.0
+```
 
-```
-AssertionError: Expected 80.0, got 100.0
-```
+Both are valid! The deterministic fallback keeps the demo working without IBM credentials.
 
 This confirms that Repro-It successfully:
 1. Analyzed the vague bug report
 2. Generated a deterministic failing pytest test
-3. Verified the test fails for the right reason using IBM watsonx.ai
+3. Verified the test fails for the right reason (using watsonx.ai or deterministic fallback)
 
 ## 90-Second Video Walkthrough Script
 
