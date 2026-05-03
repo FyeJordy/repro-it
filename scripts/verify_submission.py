@@ -122,14 +122,38 @@ class SubmissionVerifier:
             if re.search(doc_pattern, line_lower):
                 return True
         
+        # Pattern 6: Ignore documentation example markers (✓ Flags:, ✗ Ignores:)
+        if re.search(r'[✓✗]\s*(Flags|Ignores):', line):
+            return True
+        
+        # Pattern 7: Ignore placeholder/example token values from documentation
+        # Check case-sensitive fake JWT placeholder first
+        if "eyJxxxxx.yyyyy.zzzzz" in line:
+            return True
+        
+        placeholder_values = [
+            "long-token-value",
+            "long-token-value-here",
+            "long-secret-value",
+            "long-secret-value-here",
+            "long-secret-token",
+        ]
+        for placeholder in placeholder_values:
+            if placeholder in line_lower:
+                return True
+        
         # Common false positive patterns
         false_positives = [
             "your-key",
             "your_api_key",
+            "your-api-key-here",
             "example-token",
             "example_token",
             "sample-key",
             "sample_key",
+            "paste_your_key_here",
+            "watsonx_api_key",  # Environment variable name, not value
+            "abc123",  # Common example token
         ]
         
         # Check for environment variable patterns
@@ -155,14 +179,22 @@ class SubmissionVerifier:
         """Scan a file for exposed secrets. Returns list of (line_num, line, secret_type)."""
         secrets_found = []
         
-        # Secret patterns to detect
+        # Secret patterns to detect - value-aware patterns
         patterns = [
-            (r'ApiKey-', "ApiKey-", True),  # case-sensitive
-            (r'access_token', "access_token", False),
-            (r'refresh_token', "refresh_token", False),
-            (r'iam_token', "iam_token", False),
-            (r'bearer\s+[a-zA-Z0-9]', "bearer token", False),
-            (r'eyJ[a-zA-Z0-9]', "JWT token (eyJ)", True),  # case-sensitive
+            # ApiKey: Must be followed by a token-like value (10+ chars)
+            (r'ApiKey-[A-Za-z0-9_-]{10,}', "ApiKey-", True),
+            
+            # access_token/refresh_token/iam_token: Must have assignment or JSON value (12+ chars)
+            (r'access_token\s*[=:]\s*["\']?[A-Za-z0-9_-]{12,}', "access_token", False),
+            (r'refresh_token\s*[=:]\s*["\']?[A-Za-z0-9_-]{12,}', "refresh_token", False),
+            (r'iam_token\s*[=:]\s*["\']?[A-Za-z0-9_-]{12,}', "iam_token", False),
+            
+            # bearer: Must be followed by a real-looking token (12+ chars)
+            # Matches: "Authorization: Bearer <token>" or "bearer <token>"
+            (r'bearer\s+[A-Za-z0-9_-]{12,}', "bearer token", False),
+            
+            # JWT: Must be a complete JWT with three dot-separated parts
+            (r'eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+', "JWT token (eyJ)", True),
         ]
         
         try:
