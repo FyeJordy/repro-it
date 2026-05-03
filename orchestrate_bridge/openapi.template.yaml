@@ -170,10 +170,24 @@ paths:
       summary: Run Repro-It from plain-text bug report
       description: |
         Accepts a plain English bug report, converts it to JSON format,
-        executes Repro-It to reproduce the bug, and returns results.
+        executes Repro-It to reproduce the bug, and generates a failing regression test.
         
-        This endpoint combines text-to-JSON conversion with test reproduction,
-        making it easy to trigger Repro-It from natural language descriptions.
+        **Important:** This endpoint generates a failing test to reproduce the bug.
+        It does NOT fix bugs or provide solutions. The generated test serves as
+        a regression test that developers can use to verify their fix.
+        
+        **Required Information:**
+        The bug report must include all three:
+        1. Expected behavior (e.g., "expected", "should", "supposed to")
+        2. Observed behavior (e.g., "actual", "got", "returns", "shows", "error")
+        3. Feature/function context (e.g., "discount", "DOUBLE", "parse_price", "checkout")
+        
+        Vague reports like "My app crashes sometimes" will be rejected with HTTP 400.
+        
+        **Valid Example:**
+        "Hey, our DOUBLE discount code is not working on gift card orders. A customer
+        expected to save 20% on her $100 gift card. Instead the total returns $100
+        with no discount applied."
         
         The converted bug JSON is saved to bugs/from_orchestrate.json.
       requestBody:
@@ -277,7 +291,7 @@ paths:
                     description: Standard error from repro_it.py
                     example: ""
         '400':
-          description: Invalid request (missing text or invalid path)
+          description: Invalid request (missing text, too vague, or invalid path)
           content:
             application/json:
               schema:
@@ -286,28 +300,12 @@ paths:
                   ok:
                     type: boolean
                     example: false
-                  exit_code:
-                    type: integer
-                    example: -1
-                  success:
-                    type: boolean
-                    example: false
-                  judge_provider:
+                  error:
                     type: string
-                    nullable: true
-                    example: null
-                  failure_summary:
+                    example: "Bug report is too vague to reproduce"
+                  details:
                     type: string
-                    example: "Missing or empty 'text' field"
-                  converted_bug:
-                    type: object
-                    example: {}
-                  stdout:
-                    type: string
-                    example: ""
-                  stderr:
-                    type: string
-                    example: ""
+                    example: "Please include expected behavior, actual behavior, and the feature or function involved."
         '500':
           description: Server error (timeout or unexpected exception)
           content:

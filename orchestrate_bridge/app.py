@@ -96,6 +96,43 @@ def parse_repro_output(stdout: str) -> Tuple[Optional[str], str]:
     return judge_provider, failure_summary
 
 
+def validate_bug_text(text: str) -> Tuple[bool, str]:
+    """
+    Validate that bug report text contains required signals.
+    
+    A valid bug report must include:
+    1. Expected behavior signal
+    2. Observed behavior signal
+    3. Supported domain signal
+    
+    Returns:
+        (is_valid, error_details)
+    """
+    text_lower = text.lower()
+    
+    # Check for expected behavior signal
+    expected_signals = ['expected', 'should', 'supposed to', 'should have', 'wanted to']
+    has_expected = any(signal in text_lower for signal in expected_signals)
+    
+    # Check for observed behavior signal
+    observed_signals = ['actual', 'got', 'returns', 'returned', 'shows', 'showed', 'instead', 'still', 'error']
+    has_observed = any(signal in text_lower for signal in observed_signals)
+    
+    # Check for supported domain signal
+    domain_signals = ['discount', 'double', 'gift card', 'checkout', 'api', 'endpoint',
+                     'parse_price', 'function', 'price', 'returns']
+    has_domain = any(signal in text_lower for signal in domain_signals)
+    
+    if not has_expected:
+        return False, "Missing expected behavior (e.g., 'expected', 'should')"
+    if not has_observed:
+        return False, "Missing observed behavior (e.g., 'actual', 'got', 'returns')"
+    if not has_domain:
+        return False, "Missing feature/function context (e.g., 'discount', 'function name')"
+    
+    return True, ""
+
+
 @app.route('/health', methods=['GET'])
 def health():
     """Health check endpoint."""
@@ -259,13 +296,18 @@ def run_repro_from_text():
             app.logger.error("Missing or empty 'text' field")
             return jsonify({
                 "ok": False,
-                "exit_code": -1,
-                "success": False,
-                "judge_provider": None,
-                "failure_summary": "Missing or empty 'text' field",
-                "converted_bug": {},
-                "stdout": "",
-                "stderr": ""
+                "error": "Missing or empty 'text' field",
+                "details": "The 'text' field is required and cannot be empty."
+            }), 400
+        
+        # Validate bug report quality
+        is_valid, error_details = validate_bug_text(text)
+        if not is_valid:
+            app.logger.error(f"Bug report too vague: {error_details}")
+            return jsonify({
+                "ok": False,
+                "error": "Bug report is too vague to reproduce",
+                "details": "Please include expected behavior, actual behavior, and the feature or function involved."
             }), 400
         
         # Get optional parameters

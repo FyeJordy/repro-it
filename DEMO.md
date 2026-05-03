@@ -1,5 +1,27 @@
 # Repro-It Demo Guide
 
+## One-Shot Setup
+
+Fresh clone to working demo in one command block:
+
+```bash
+git clone https://github.com/FyeJordy/repro-it.git
+cd repro-it
+python3 -m pip install -r requirements.txt
+python3 -m pip install -r demo_repo/requirements.txt
+python3 scripts/verify_submission.py
+python3 repro_it.py --bug bugs/discount_double_gift_card.json --repo demo_repo --verbose
+```
+
+**Optional: Enable watsonx.ai judging**
+
+```bash
+export WATSONX_API_KEY="your-api-key"
+export WATSONX_PROJECT_ID="your-project-id"
+export WATSONX_URL="https://us-south.ml.cloud.ibm.com"
+python3 repro_it.py --bug bugs/discount_double_gift_card.json --repo demo_repo --verbose
+```
+
 ## Quick Start
 
 ### Run the Demo
